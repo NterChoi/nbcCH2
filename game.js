@@ -8,8 +8,8 @@ class Player {
 
     }
 
-    attack() {
-
+    attack(Monster) {
+        Monster.hp - this.atk;
     }
 }
 
@@ -19,8 +19,8 @@ class Monster {
         this.atk = 2.5;
     }
 
-    attack() {
-        // 몬스터의 공격
+    attack(Player) {
+        Player.hp - this.atk;
     }
 }
 
@@ -41,7 +41,7 @@ function displayStatus(stage, player, monster) {
 const battle = async (stage, player, monster) => {
     let logs = [];
 
-    while(player.hp > 0) {
+    while(player.hp > 0 && monster.hp > 0) {
         console.clear();
         displayStatus(stage, player, monster);
 
@@ -59,13 +59,11 @@ const battle = async (stage, player, monster) => {
 
         switch (choice) {
             case '1':
-                console.log(chalk.green('게임을 시작합니다.'));
-                // 여기에서 새로운 게임 시작 로직을 구현
-                startGame();
+                logs.push(`몬스터에게 ${player.atk}의 피해를 입혔습니다.`)
+                player.attack(monster);
                 break;
             case '2':
-                console.log(chalk.yellow('구현 준비중입니다.. 게임을 시작하세요'));
-                // 업적 확인하기 로직을 구현
+
                 break;
             default:
                 console.log(chalk.red(`올바른 선택을 하세요.`));
