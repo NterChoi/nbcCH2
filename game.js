@@ -11,6 +11,13 @@ class Player {
     attack(Monster) {
         Monster.hp = Monster.hp - this.atk;
     }
+
+    heal(){
+        this.hp += 30;
+    }
+    gainAtk(){
+        this.atk += 2;
+    }
 }
 
 class Monster {
@@ -36,15 +43,16 @@ function displayStatus(stage, player, monster) {
         ),
     );
     console.log(chalk.magentaBright(`=====================\n`));
+    console.log(chalk.rgb(255, 165, 0)(`야생의 몬스터를 마주쳤습니다!`))
 
 }
 
 const battle = async (stage, player, monster) => {
     let logs = [];
-
+    let consoleCount = 0;
 
     while(player.hp > 0 && monster.hp > 0) {
-          console.clear();
+        console.clear();
         displayStatus(stage, player, monster);
 
         logs.forEach((log) => console.log(log));
@@ -57,22 +65,36 @@ const battle = async (stage, player, monster) => {
         const choice = readlineSync.question('당신의 선택은? ');
 
         // 플레이어의 선택에 따라 다음 행동 처리
-        logs.push(chalk.green(`${choice}를 선택하셨습니다.`));
+        // logs.push(chalk.green(`${choice}를 선택하셨습니다.`));
 
         switch (choice) {
             case '1':
-                logs.push(chalk.green(`몬스터에게 ${player.atk}의 피해를 입혔습니다.`))
+                logs.push(chalk.green(`[${consoleCount}] 몬스터에게 ${player.atk}의 피해를 입혔습니다.`))
                 player.attack(monster);
                 break;
             case '2':
-                logs.push(chalk.green(`몬스터에게서 도망쳤습니다.`))
+                console.log(chalk.green(`[${consoleCount}] 몬스터에게서 도망쳤습니다.`))
+                player.heal();
+                player.gainAtk();
                 return;
             default:
                 console.log(chalk.red(`올바른 선택을 하세요.`));
         }
-        logs.push(chalk.red(`몬스터가 ${monster.atk} 피해를 입혔습니다.`));
+        logs.push(chalk.red(`[${consoleCount}] 몬스터가 ${monster.atk} 피해를 입혔습니다.`));
+        consoleCount++;
         monster.attack(player);
+        if( monster.hp <= 0 && stage < 10){
+            console.log(chalk.green(`몬스터를 처치 하였습니다 다음 스테이지로 넘어갑니다.`))
+            player.heal();
+            player.gainAtk();
+            return;
+        }else if (player.hp <= 0) {
+            console.log(chalk.red(`당신은 죽었습니다.`))
+            console.log(chalk.red(`게임 오버!`))
 
+        }else if(monster.hp <= 0 && stage === 10){
+            console.log(chalk.green(`축하합니다! 모든 스테이지를 클리어했습니다!`));
+        }
     }
 };
 
@@ -88,5 +110,6 @@ export async function startGame() {
         // 스테이지 클리어 및 게임 종료 조건
 
         stage++;
+
     }
 }
