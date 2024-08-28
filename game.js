@@ -12,10 +12,11 @@ class Player {
         Monster.hp = Monster.hp - this.atk;
     }
 
-    heal(){
+    heal() {
         this.hp += 30;
     }
-    gainAtk(){
+
+    gainAtk() {
         this.atk += 2;
     }
 }
@@ -51,10 +52,9 @@ const battle = async (stage, player, monster) => {
     let logs = [];
     let consoleCount = 0;
 
-    while(player.hp > 0 && monster.hp > 0) {
+    while (player.hp > 0) {
         console.clear();
         displayStatus(stage, player, monster);
-
         logs.forEach((log) => console.log(log));
 
         console.log(
@@ -74,6 +74,8 @@ const battle = async (stage, player, monster) => {
                 break;
             case '2':
                 console.log(chalk.green(`[${consoleCount}] 몬스터에게서 도망쳤습니다.`))
+                logs.forEach((log) => console.log(log));
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 player.heal();
                 player.gainAtk();
                 return;
@@ -83,17 +85,19 @@ const battle = async (stage, player, monster) => {
         logs.push(chalk.red(`[${consoleCount}] 몬스터가 ${monster.atk} 피해를 입혔습니다.`));
         consoleCount++;
         monster.attack(player);
-        if( monster.hp <= 0 && stage < 10){
-            console.log(chalk.green(`몬스터를 처치 하였습니다 다음 스테이지로 넘어갑니다.`))
+        if (monster.hp <= 0 && stage < 10) {
+            console.log(chalk.green(`몬스터를 처치 하였습니다 다음 스테이지로 넘어갑니다.`));
+            logs.forEach((log) => console.log(log));
+            await new Promise(resolve => setTimeout(resolve, 2000));
             player.heal();
             player.gainAtk();
             return;
-        }else if (player.hp <= 0) {
-            console.log(chalk.red(`당신은 죽었습니다.`))
-            console.log(chalk.red(`게임 오버!`))
-
-        }else if(monster.hp <= 0 && stage === 10){
+        } else if (player.hp <= 0) {
+            console.log(chalk.red(`당신은 죽었습니다.`));
+            console.log(chalk.red(`게임 오버!`));
+        } else if (monster.hp <= 0 && stage === 10) {
             console.log(chalk.green(`축하합니다! 모든 스테이지를 클리어했습니다!`));
+            return;
         }
     }
 };
